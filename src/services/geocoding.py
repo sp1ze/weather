@@ -1,10 +1,12 @@
 import requests
-from functools import lru_cache
+from cachetools import TTLCache, cached
 
 API_URL = "https://nominatim.openstreetmap.org/search"
 
+city_cache = TTLCache(maxsize=1000, ttl=60 * 60)
 
-@lru_cache(maxsize=128)
+
+@cached(city_cache)
 def get_city_coordinates(city_name):
     params = {"q": city_name, "format": "json", "limit": 1}
     response = requests.get(

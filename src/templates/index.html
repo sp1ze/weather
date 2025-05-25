@@ -70,6 +70,7 @@ function searchWeather() {
                         <h4>${data.city}</h4>
                         <p><strong>Coordinates:</strong> ${data.coordinates.lat}, ${data.coordinates.lon}</p>
                         <p><strong>Temperature:</strong> ${data.weather.temperature} °C</p>
+                        <p><strong>Wind speed:</strong> ${data.weather.wind_speed ?? 'No data'} m/s</p>
                         <p><strong>Weather:</strong> ${data.weather.description}</p>
                     </div>
                 `;

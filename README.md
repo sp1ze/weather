@@ -1,3 +1,20 @@
+## Demo
+Try the cloud run demo [here](https://weather-app-726246433940.europe-west1.run.app/)
+
+
+## How the Application Works
+
+**Flow:**
+1. User types a city name on the homepage.
+2. Frontend JavaScript sends autocomplete requests to the backend, which queries OpenStreetMap’s API for matching cities.
+3. Once a city is chosen, the backend requests its coordinates from OpenStreetMap.
+4. The backend then fetches live weather data for those coordinates from the yr.no weather API.
+5. The weather results are returned and rendered on the page.
+
+**API Structure:**
+- `/api/city_suggestions` — Returns city autocomplete results.
+- `/api/weather` — Returns weather info for a requested city.
+
 ## Developer Quickstart
 
 ### Requirements
