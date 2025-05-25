@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+      .centered { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+      .search-box { width: 100%; max-width: 400px; position: relative; }
+      #suggestions { position: absolute; width: 100%; z-index: 1000; }
+    </style>
+</head>
+<body>
+<div class="centered">
+    <div class="search-box text-center">
+        <h1>Weather Search</h1>
+        <input id="city" class="form-control" placeholder="Enter city name" autofocus autocomplete="off" oninput="getSuggestions()">
+        <ul id="suggestions" class="list-group"></ul>
+        <button class="btn btn-primary mt-2" onclick="searchWeather()">Get Weather</button>
+        <div id="result" class="mt-4"></div>
+    </div>
+</div>
+<script>
+let selectedCity = null;
+let debounceTimeout = null;
+
+function getSuggestions() {
+    const q = document.getElementById('city').value.trim();
+    selectedCity = null;
+
+    if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+    }
+
+    debounceTimeout = setTimeout(() => {
+        if (!q) {
+            document.getElementById('suggestions').innerHTML = '';
+            return;
+        }
+        fetch(`/api/city_suggestions?q=${encodeURIComponent(q)}`)
+            .then(res => res.json())
+            .then(data => {
+                let html = '';
+                for (const s of data) {
+                    html += `<li class="list-group-item list-group-item-action" onclick='selectCity("${s.name.replace(/"/g, "&quot;")}", ${s.lat}, ${s.lon})'>${s.name}</li>`;
+                }
+                document.getElementById('suggestions').innerHTML = html;
+            });
+    }, 300);
+}
+
+function selectCity(name, lat, lon) {
+    document.getElementById('city').value = name;
+    selectedCity = {name, lat, lon};
+    document.getElementById('suggestions').innerHTML = '';
+}
+
+function searchWeather() {
+    let cityParam = document.getElementById('city').value.trim();
+    if (!cityParam) return;
+    document.getElementById('result').innerHTML = 'Loading...';
+
+    fetch(`/api/weather?city=${encodeURIComponent(cityParam)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById('result').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            } else {
+                document.getElementById('result').innerHTML = `
+                    <div class="card p-3">
+                        <h4>${data.city}</h4>
+                        <p><strong>Coordinates:</strong> ${data.coordinates.lat}, ${data.coordinates.lon}</p>
+                        <p><strong>Temperature:</strong> ${data.weather.temperature} °C</p>
+                        <p><strong>Weather:</strong> ${data.weather.description}</p>
+                    </div>
+                `;
+            }
+        });
+}
+
+document.addEventListener('click', function(e){
+    if (!document.getElementById('city').contains(e.target)) {
+        document.getElementById('suggestions').innerHTML = '';
+    }
+});
+</script>
+</body>
+</html>
