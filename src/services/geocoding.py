@@ -33,12 +33,11 @@ def search_city_hints(partial_city):
     suggestions = []
     if response.status_code == 200:
         for item in response.json():
-            if item.get("type") in ["city", "town", "village"]:
-                suggestions.append(
-                    {
-                        "name": item["display_name"],
-                        "lat": float(item["lat"]),
-                        "lon": float(item["lon"]),
-                    }
-                )
+            suggestions.append(
+                {
+                    "name": item["display_name"],
+                    "lat": float(item["lat"]),
+                    "lon": float(item["lon"]),
+                }
+            )
     return suggestions
